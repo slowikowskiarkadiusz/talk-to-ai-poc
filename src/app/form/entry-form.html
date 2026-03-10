@@ -5,6 +5,19 @@
     <mat-card-subtitle>Wprowadź dane lokalizacji i wymiarów</mat-card-subtitle>
   </mat-card-header>
 
+  <div class="speech-fab-wrapper">
+    <button
+      mat-fab
+      extended
+      color="primary"
+      (click)="openSpeechDialog()"
+      aria-label="Wypełnij formularz głosowo"
+    >
+      <mat-icon>mic</mat-icon>
+      Wypełnij głosowo
+    </button>
+  </div>
+
   <mat-card-content>
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="row">

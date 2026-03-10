@@ -1,6 +1,12 @@
+.speech-fab-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 8px;
+}
+
 .form-card {
   max-width: 640px;
-  margin: 32px auto;
+  margin: 16px auto 32px;
 }
 
 form {

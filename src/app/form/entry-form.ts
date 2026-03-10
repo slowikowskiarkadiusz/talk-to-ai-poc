@@ -3,10 +3,13 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { SpeechDialog, SpeechDialogData } from '../speech-dialog/speech-dialog';
+import { EntryFormData } from '../ollama';
 
 @Component({
   selector: 'entry-form',
@@ -30,7 +33,7 @@ export class EntryForm {
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.form = this.fb.group({
       greenhouse: [null, Validators.required],
       block: [null, Validators.required],
@@ -41,10 +44,22 @@ export class EntryForm {
     });
   }
 
+  openSpeechDialog() {
+    const data: SpeechDialogData = { greenhouses: this.greenhouses, blocks: this.blocks };
+    const ref = this.dialog.open(SpeechDialog, { width: '480px', data });
+    ref.afterClosed().subscribe((data: EntryFormData) => {
+      console.log("Data", data);
+      this.form.controls['greenhouse'].setValue(data.greenhouse);
+      this.form.controls['block'].setValue(data.block);
+      this.form.controls['plantHeight'].setValue(data.plantHeight);
+      this.form.controls['stemWidth'].setValue(data.stemWidth);
+      this.form.controls['leafWidth'].setValue(data.leafWidth);
+      this.form.controls['bedDepth'].setValue(data.bedDepth);
+    });
+  }
+
   onSubmit() {
-    if (this.form.valid) {
-      console.log(this.form.value);
-    }
+    if (this.form.valid) console.log(this.form.value);
   }
 
   onReset() {
