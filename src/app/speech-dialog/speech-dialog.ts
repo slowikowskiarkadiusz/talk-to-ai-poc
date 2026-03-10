@@ -15,7 +15,6 @@ export interface SpeechDialogData {
   blocks: string[],
 }
 
-// ── DIALOG COMPONENT ──────────────────────────────────────────────
 @Component({
   selector: 'app-speech-dialog',
   standalone: true,
@@ -42,17 +41,17 @@ export class SpeechDialog implements OnDestroy {
   transcript = '';
 
   hints = [
-    { icon: 'home', label: 'Szklarnia i blok' },
-    { icon: 'height', label: 'Wysokość rośliny' },
-    { icon: 'linear_scale', label: 'Szerokość łodygi' },
-    { icon: 'nature', label: 'Szerokość liścia' },
-    { icon: 'vertical_align_bottom', label: 'Głębokość w grzędzie' },
+    { icon: 'home', label: 'Greenhouse and block' },
+    { icon: 'height', label: 'Plant height' },
+    { icon: 'linear_scale', label: 'Stem diameter' },
+    { icon: 'nature', label: 'Leaf width' },
+    { icon: 'vertical_align_bottom', label: 'Bed depth' },
   ];
 
   get titleLabel(): string {
-    if (this.isLoading) return 'Przetwarzanie…';
-    if (this.isRecording) return 'Nagrywanie…';
-    return 'Opis głosowy';
+    if (this.isLoading) return 'Processing…';
+    if (this.isRecording) return 'Recording…';
+    return 'Description';
   }
 
   private recognition: any;
@@ -64,17 +63,15 @@ export class SpeechDialog implements OnDestroy {
     this.startRecording();
   }
 
-  // ── SPEECH RECOGNITION SETUP ──────────────────────────────────────
-
   private initRecognition(): void {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      console.warn('SpeechRecognition nie jest wspierane w tej przeglądarce.');
+      console.warn('SpeechRecognition not supported.');
       return;
     }
 
     this.recognition = new SR();
-    this.recognition.lang = 'pl-PL';
+    this.recognition.lang = 'en-US';
     this.recognition.continuous = true;
     this.recognition.interimResults = true;
 
@@ -116,27 +113,20 @@ export class SpeechDialog implements OnDestroy {
     this.recognition.stop();
   }
 
-  // ── FINISH BUTTON ─────────────────────────────────────────────────
-
   onFinish(): void {
     this.stopRecording();
     this.sendToServer();
   }
 
-  // ── SERVER CALL ───────────────────────────────────────────────────
-
   private sendToServer(): void {
     if (!this.transcript) return;
     this.isLoading = true;
-    console.log('this.isLoading', this.isLoading);
     this.changeDetectorRef.markForCheck();
 
     this.ollama.sendEntryFormPrompt(this.transcript, this.modalData.greenhouses, this.modalData.blocks)
       .then(x => { this.dialogRef.close(x) })
       .finally(() => this.isLoading = false);
   }
-
-  // ── CLOSE ─────────────────────────────────────────────────────────
 
   onClose(): void {
     this.stopRecording();

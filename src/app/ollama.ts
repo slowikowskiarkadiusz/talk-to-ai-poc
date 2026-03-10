@@ -8,7 +8,7 @@ export interface EntryFormData {  greenhouse: string,  block: string,  plantHeig
 })
 export class Ollama {
   public async sendPrompt(prompt: string): Promise<string> {
-    const response = await fetch('http://localhost:11434/api/chat', {
+    const response = await fetch('/ollama/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

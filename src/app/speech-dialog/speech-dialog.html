@@ -11,9 +11,8 @@
 
 <!-- CONTENT -->
 <mat-dialog-content>
-  <!-- Hinty – ukryte podczas loadingu -->
   <ng-container *ngIf="!isLoading">
-    <p class="hints-label">Pamiętaj, żeby wspomnieć o:</p>
+    <p class="hints-label">Remember to mention:</p>
     <mat-chip-set>
       <mat-chip *ngFor="let hint of hints" [disabled]="true">
         <mat-icon matChipAvatar>{{ hint.icon }}</mat-icon>
@@ -22,28 +21,26 @@
     </mat-chip-set>
   </ng-container>
 
-  <!-- Spinner podczas przetwarzania -->
   <div class="spinner-wrapper" *ngIf="isLoading">
     <mat-spinner diameter="48"></mat-spinner>
-    <p class="spinner-label">Przetwarzam wypowiedź…</p>
+    <p class="spinner-label">Processing your input…</p>
   </div>
 
-  <!-- Transkrypcja jako zwykły tekst (nie edytowalny) -->
-  <div class="transcript-box" *ngIf="!isLoading">
+  <div *ngIf="!isLoading">
     <p class="transcript-text" [class.placeholder]="!transcript">
-      {{ transcript || 'Zacznij mówić… tekst pojawi się tutaj automatycznie.' }}
+      {{ transcript || 'Start speaking… text will appear here automatically.' }}
     </p>
   </div>
 
   <div class="speech-fab-wrapper" *ngIf="!isLoading">
     <button mat-fab extended color="primary" (click)="onFinish()" [disabled]="!transcript">
       <mat-icon>check</mat-icon>
-      Zakończ i wypełnij
+      Done
     </button>
   </div>
 </mat-dialog-content>
 
 <!-- ACTIONS -->
 <mat-dialog-actions align="end" *ngIf="!isLoading">
-  <button mat-button (click)="onClose()">Anuluj</button>
+  <button mat-button (click)="onClose()">Cancel</button>
 </mat-dialog-actions>
