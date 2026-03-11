@@ -1,0 +1,105 @@
+.speech-fab-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 8px;
+}
+
+@keyframes rainbow-outline {
+  0% {
+    box-shadow: 0 0 0 2px #ff6b6b;
+  }
+  20% {
+    box-shadow: 0 0 0 2px #ffd93d;
+  }
+  40% {
+    box-shadow: 0 0 0 2px #6bcb77;
+  }
+  60% {
+    box-shadow: 0 0 0 2px #4d96ff;
+  }
+  80% {
+    box-shadow: 0 0 0 2px #c77dff;
+  }
+  100% {
+    box-shadow: 0 0 0 2px #ff6b6b;
+  }
+}
+
+::ng-deep .glow-wrapper .mat-mdc-extended-fab {
+  border-radius: 50px !important;
+}
+
+.glow-wrapper {
+  position: relative;
+  display: inline-flex;
+  border-radius: 50px;
+  animation: rainbow-outline 3s linear infinite;
+  overflow: visible; /* sparkle muszą wychodzić do góry */
+}
+
+.sparkle {
+  z-index: 900;
+  position: absolute;
+  bottom: 8px; /* startują tuż nad dolną krawędzią przycisku */
+  animation: floatUp 2s ease-in infinite;
+  pointer-events: none;
+  opacity: 0;
+  color: #a78bfa;
+
+  svg {
+    width: 1em;
+    height: 1em;
+    filter: drop-shadow(0 0 3px #c77dff);
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-70px) scale(1);
+    opacity: 0;
+  }
+}
+
+.form-card {
+  max-width: 640px;
+  margin: 16px auto 32px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+}
+
+.half {
+  flex: 1;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.54);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 8px 0 4px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}

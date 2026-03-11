@@ -6,16 +6,23 @@
   </mat-card-header>
 
   <div class="speech-fab-wrapper">
-    <button
-      mat-fab
-      extended
-      color="primary"
-      (click)="openSpeechDialog()"
-      aria-label="Fill form by voice"
-    >
-      <mat-icon>mic</mat-icon>
-      Dictate
-    </button>
+    <div class="glow-wrapper">
+      <span
+        class="sparkle"
+        *ngFor="let s of sparkles"
+        [style.left]="s.left"
+        [style.font-size]="s.size"
+        [style.animation-delay]="s.delay"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2 C12 2 13 8 18 12 C13 16 12 22 12 22 C12 22 11 16 6 12 C11 8 12 2 12 2Z" />
+        </svg>
+      </span>
+      <button mat-fab extended color="primary" (click)="openSpeechDialog()">
+        <mat-icon>mic</mat-icon>
+        Dictate
+      </button>
+    </div>
   </div>
 
   <mat-card-content>
@@ -29,7 +36,9 @@
           <mat-icon matSuffix>house</mat-icon>
           <mat-error *ngIf="form.get('greenhouse')?.hasError('required')">Required</mat-error>
         </mat-form-field>
+      </div>
 
+      <div class="row">
         <mat-form-field appearance="outline" class="half">
           <mat-label>Block</mat-label>
           <mat-select formControlName="block">
@@ -40,7 +49,27 @@
         </mat-form-field>
       </div>
 
-      <div class="section-label">Plant dimensions</div>
+      <div class="section-label">Plant data</div>
+
+      <div class="row">
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Target</mat-label>
+          <mat-select formControlName="target">
+            <mat-option *ngFor="let g of targets" [value]="g">{{ g }}</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>bug_report</mat-icon>
+          <mat-error *ngIf="form.get('target')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half">
+          <mat-label>Target Kind</mat-label>
+          <mat-select formControlName="targetKind">
+            <mat-option *ngFor="let g of targetKinds" [value]="g">{{ g }}</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>manage_search</mat-icon>
+          <mat-error *ngIf="form.get('targetKind')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+      </div>
 
       <div class="row">
         <mat-form-field appearance="outline" class="half">
@@ -75,7 +104,7 @@
         <mat-form-field appearance="outline" class="half">
           <mat-label>Bed depth</mat-label>
           <input matInput type="number" formControlName="bedDepth" min="0" />
-          <span matSuffix>m</span>
+          <span matSuffix>cm</span>
           <mat-icon matPrefix>vertical_align_bottom</mat-icon>
           <mat-error *ngIf="form.get('bedDepth')?.hasError('required')">Required</mat-error>
           <mat-error *ngIf="form.get('bedDepth')?.hasError('min')">Value must be >= 0</mat-error>

@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { EntryForm } from './form/entry-form';
+import { EntryForm } from './entity-form/entry-form';
 
 @Component({
   selector: 'app-root',

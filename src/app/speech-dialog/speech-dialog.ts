@@ -13,6 +13,7 @@ import { Ollama } from '../ollama';
 export interface SpeechDialogData {
   greenhouses: string[],
   blocks: string[],
+  targetKinds: string[],
 }
 
 @Component({
@@ -42,6 +43,7 @@ export class SpeechDialog implements OnDestroy {
 
   hints = [
     { icon: 'home', label: 'Greenhouse and block' },
+    { icon: 'bug_report', label: 'Spotted problem' },
     { icon: 'height', label: 'Plant height' },
     { icon: 'linear_scale', label: 'Stem diameter' },
     { icon: 'nature', label: 'Leaf width' },
@@ -123,7 +125,7 @@ export class SpeechDialog implements OnDestroy {
     this.isLoading = true;
     this.changeDetectorRef.markForCheck();
 
-    this.ollama.sendEntryFormPrompt(this.transcript, this.modalData.greenhouses, this.modalData.blocks)
+    this.ollama.sendEntryFormPrompt(this.transcript, this.modalData.greenhouses, this.modalData.blocks, this.modalData.targetKinds)
       .then(x => { this.dialogRef.close(x) })
       .finally(() => this.isLoading = false);
   }
