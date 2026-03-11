@@ -4,5 +4,10 @@
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": { "^/ollama": "" }
+  },
+  "/api": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "changeOrigin": true
   }
 }

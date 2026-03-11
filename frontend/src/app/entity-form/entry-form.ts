@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -80,6 +81,7 @@ function getTargetKinds(): string[] {
 })
 export class EntryForm {
   private dialogRef = inject(MatDialogRef<EntryForm>);
+  private http = inject(HttpClient);
 
   greenhouses = ['Greenhouse 1', 'Greenhouse 2', 'Greenhouse 3'];
   blocks = ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6'];
@@ -132,7 +134,11 @@ export class EntryForm {
   }
 
   onSubmit() {
-    if (this.form.valid) console.log(this.form.value);
+    if (!this.form.valid) return;
+    const { target, ...payload } = this.form.value;
+    this.http.post('/api/plantentries', payload).subscribe({
+      next: () => this.dialogRef.close(true),
+    });
   }
 
   onReset() {
