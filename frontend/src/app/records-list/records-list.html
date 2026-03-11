@@ -1,0 +1,55 @@
+<div class="records-container">
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && records.length === 0" class="empty-state">
+    <mat-icon>eco</mat-icon>
+    <p>No records yet. Use the + button to add one.</p>
+  </div>
+
+  <table mat-table [dataSource]="records" *ngIf="!loading && records.length > 0" class="records-table">
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef>Date</th>
+      <td mat-cell *matCellDef="let r">{{ r.createdAt | date:'short' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="greenhouse">
+      <th mat-header-cell *matHeaderCellDef>Greenhouse</th>
+      <td mat-cell *matCellDef="let r">{{ r.greenhouse }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="block">
+      <th mat-header-cell *matHeaderCellDef>Block</th>
+      <td mat-cell *matCellDef="let r">{{ r.block }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="targetKind">
+      <th mat-header-cell *matHeaderCellDef>Target</th>
+      <td mat-cell *matCellDef="let r">{{ r.targetKind }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="plantHeight">
+      <th mat-header-cell *matHeaderCellDef>Height</th>
+      <td mat-cell *matCellDef="let r">{{ r.plantHeight }} cm</td>
+    </ng-container>
+
+    <ng-container matColumnDef="stemWidth">
+      <th mat-header-cell *matHeaderCellDef>Stem</th>
+      <td mat-cell *matCellDef="let r">{{ r.stemWidth }} cm</td>
+    </ng-container>
+
+    <ng-container matColumnDef="leafWidth">
+      <th mat-header-cell *matHeaderCellDef>Leaf</th>
+      <td mat-cell *matCellDef="let r">{{ r.leafWidth }} cm</td>
+    </ng-container>
+
+    <ng-container matColumnDef="bedDepth">
+      <th mat-header-cell *matHeaderCellDef>Bed</th>
+      <td mat-cell *matCellDef="let r">{{ r.bedDepth }} cm</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
