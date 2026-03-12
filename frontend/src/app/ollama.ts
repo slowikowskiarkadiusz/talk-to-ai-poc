@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector, runInInjectionContext } from '@angular/core';
+import { AiAction } from './ai-processors/ai-processor';
+import { aiProcessors } from './ai-processors/list';
 
 export interface EntryFormData {
   greenhouse: string,
@@ -14,6 +16,8 @@ export interface EntryFormData {
   providedIn: 'root',
 })
 export class Ollama {
+  constructor(private injector: Injector) { }
+
   public async sendPrompt(prompt: string): Promise<string> {
     const response = await fetch('/ollama/api/chat', {
       method: 'POST',
@@ -30,6 +34,47 @@ export class Ollama {
     const data = await response.json();
     console.log(data);
     return data.message.content;
+  }
+
+  public async processAiActionRequest(transcript: string) {
+    const firstResult = await this.sendOverviewPrompt(transcript);
+    console.log("firstResult", firstResult);
+    const aiProcessor = aiProcessors.filter(x => x.appName == firstResult[0])[0];
+    const aiAction = aiProcessor.actions.filter(x => x.name == firstResult[1])[0];
+    const secondResult = await this.sendActionPrompt(transcript, aiAction);
+    runInInjectionContext(this.injector, () => aiAction.func(secondResult));
+  }
+
+  private async sendOverviewPrompt(transcript: string): Promise<[string, string]> {
+    console.log("transcript", transcript)
+    const prompt = `You can open one of the apps: ${aiProcessors.map(x => `${x.appName}`).join(", ")}.
+      ${aiProcessors.map(x => `In ${x.appName} your actions are: [${x.actions.map(x => `"${x.name}"`).join(", ")}].`)}
+
+    Examples:
+    ${aiProcessors.map(x => `"${x.examples[0]}" -> "${x.examples[1]}, ${x.examples[2]}"`)}
+
+    The user has requested: "${transcript}".
+
+    Return ONLY: "AppName, ActionName". No explanation, no other text or quotes or anything. Just letters and a comma.`;
+    console.log("prompt", prompt);
+    const result = await this.sendPrompt(prompt);
+    console.log("result", result);
+    const split = result.split(',');
+    return [split[0].trim().toLowerCase(), split[1].trim().toLowerCase()];
+  }
+
+  private async sendActionPrompt(transcript: string, action: AiAction): Promise<{ [p: string]: string }> {
+    const prompt = `Return only valid JSON, no explanation.
+    JSON schema to fill: { ${action.parameters.map(x => `"${x.name}": ""`)} }
+    ${action.parameters.map(x => `${x.name}: ${x.description}`)}
+    User said: "${transcript}"
+    Deduce proper values for the JSON parameters.
+    Return only valid parsable JSON: `;
+    console.log("prompt", prompt);
+    const result = await this.sendPrompt(prompt);
+    console.log("result", result);
+    const match = result.match(/\{[\s\S]*\}/);
+    return JSON.parse(match![0]);
   }
 
   public async sendEntryFormPrompt(transcript: string, greenhouses: string[], blocks: string[], targetKinds: string[]): Promise<EntryFormData> {

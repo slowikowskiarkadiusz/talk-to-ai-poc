@@ -1,11 +1,66 @@
-<mat-tab-group>
-  <mat-tab label="Records">
-    <records-list #recordsList></records-list>
-  </mat-tab>
-  <mat-tab label="Analytics">
-  </mat-tab>
-</mat-tab-group>
+<div class="app-shell">
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
 
-<button mat-fab class="add-fab" color="primary" (click)="openEntryForm()">
-  <mat-icon>add</mat-icon>
-</button>
+  <nav class="bottom-nav">
+    <a
+      class="nav-item"
+      routerLink="/home"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <mat-icon>home</mat-icon>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-item" routerLink="/apps" routerLinkActive="active">
+      <mat-icon>grid_view</mat-icon>
+      <span>Apps</span>
+    </a>
+
+    <button class="nav-item nav-item--center" (click)="openAiDialog()">
+      <div class="ai-btn" matRipple matRippleColor="rgba(255,255,255,0.25)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-25 -25 250 250" width="200" height="200">
+          <path
+            fill="white"
+            d="
+            M 82,42
+            C 90.7,91.3 90.7,91.3 140,100
+            C 90.7,108.7 90.7,108.7 82,158
+            C 73.3,108.7 73.3,108.7 24,100
+            C 73.3,91.3 73.3,91.3 82,42 Z"
+          />
+          <path
+            fill="white"
+            d="
+            M 155,50
+            C 157.25,62.75 157.25,62.75 170,65
+            C 157.25,67.25 157.25,67.25 155,80
+            C 152.75,67.25 152.75,67.25 140,65
+            C 152.75,62.75 152.75,62.75 155,50 Z"
+          />
+          <path
+            fill="white"
+            d="
+            M 163,116
+            C 166.6,136.4 166.6,136.4 187,140
+            C 166.6,143.6 166.6,143.6 163,164
+            C 159.4,143.6 159.4,143.6 139,140
+            C 159.4,136.4 159.4,136.4 163,116 Z"
+          />
+        </svg>
+      </div>
+    </button>
+
+    <a class="nav-item" routerLink="/articles" routerLinkActive="active">
+      <mat-icon>article</mat-icon>
+      <span>Articles</span>
+    </a>
+
+    <a class="nav-item" routerLink="/settings" routerLinkActive="active">
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </a>
+  </nav>
+</div>

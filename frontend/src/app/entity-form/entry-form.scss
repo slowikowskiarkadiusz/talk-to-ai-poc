@@ -34,13 +34,13 @@
   display: inline-flex;
   border-radius: 50px;
   animation: rainbow-outline 3s linear infinite;
-  overflow: visible; /* sparkle muszą wychodzić do góry */
+  overflow: visible; /* sparkles must go upward */
 }
 
 .sparkle {
   z-index: 900;
   position: absolute;
-  bottom: 8px; /* startują tuż nad dolną krawędzią przycisku */
+  bottom: 8px; /* start just above the bottom edge of the button */
   animation: floatUp 2s ease-in infinite;
   pointer-events: none;
   opacity: 0;

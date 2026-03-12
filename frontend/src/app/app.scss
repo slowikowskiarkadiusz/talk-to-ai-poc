@@ -1,6 +1,86 @@
-.add-fab {
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 56px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-nav {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 100;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--mat-sys-surface);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  overflow: visible;
+}
+
+.nav-item {
+  flex: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-decoration: none;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.6rem;
+  gap: 2px;
+  transition: color 0.2s;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &.active {
+    color: var(--mat-sys-primary);
+  }
+
+  &--center {
+    justify-content: flex-end;
+    padding-bottom: 6px;
+
+    .ai-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateY(-10px);
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.45);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+
+      mat-icon {
+        color: white;
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    &.active .ai-btn {
+      box-shadow: 0 6px 24px rgba(102, 126, 234, 0.65);
+    }
+  }
 }

@@ -1,4 +1,4 @@
-# TalkToAiPoc
+<!--# TalkToAiPoc
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
 
@@ -56,4 +56,76 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 ## Additional Resources
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.-->
+
+first prompt:
+{
+  "actions": {
+    "open page":{}
+    "open module":{
+      "one of": {
+        "plant growth": {
+          "keywords": ["field monitoring", "crop inspection", "pest surveillance", "field observation", "agronomic walk", "field scouting log"],
+          "actions": ["create report", "show chart"]
+        },
+        "devices": {
+          "keywords": ["iot", "remote devices", "internet of things", "device management", "smart home", "smart devices"]
+          "actions": ["turn device on or off", "dim lamp", "tweak thermostat"]
+        },
+        "weather": {
+          "keywords": ["climate monitoring", "agrometeorology", "field weather", "microclimate tracking", "atmospheric conditions", "weather station data"]
+          "actions": ["show forecast"]
+        }
+      }
+    }
+  }
+}
+
+plant growth:
+{
+  "create report":{
+    "keywords": ["new entry"],
+    "parameters":{}
+  },
+  "show chart":{
+    "keywords": ["summarize data"]
+    "parameters":{
+      "property":{
+        "type": "string",
+        "description": "the name of the property to show on the chart. one of: [ PlantHeight, StemWidth, LeafWidth, BedDepth]"
+      }
+    }
+  }
+}
+
+devices actions:
+{
+  "turn device on or off": {
+    "keywords":["turn off", "turn on", "disable"],
+    "parameters":{
+      "deviceName": {
+        "type":"string",
+        "description":"the name of the device"
+      }
+    }
+  },
+  "tweak thermostat": {
+    "keywords":["set temperature", "warmer", "cooler"]
+  },
+  "dim lamp": {
+    "keywords": ["light", "dark"],
+    "parameters":{
+      "deviceName": {
+        "type":"string",
+        "description":"the name of the lamp"
+      }
+    }
+  }
+}
+
+weather actions:
+{
+  "show forecast":{
+    "keywords": ["what will be the weather", "forecast"]
+  },
+}

@@ -1,0 +1,11 @@
+<mat-tab-group>
+  <mat-tab label="Records">
+    <records-list #recordsList></records-list>
+  </mat-tab>
+  <mat-tab label="Analytics">
+  </mat-tab>
+</mat-tab-group>
+
+<button mat-fab class="add-fab" color="primary" (click)="openEntryForm()">
+  <mat-icon>add</mat-icon>
+</button>

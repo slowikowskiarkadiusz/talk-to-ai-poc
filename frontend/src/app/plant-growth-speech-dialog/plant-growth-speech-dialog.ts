@@ -10,14 +10,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Ollama } from '../ollama';
 
-export interface SpeechDialogData {
+export interface PlantGrowthSpeechDialogData {
   greenhouses: string[],
   blocks: string[],
   targetKinds: string[],
 }
 
 @Component({
-  selector: 'app-speech-dialog',
+  selector: 'app-plant-growth-speech-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -30,12 +30,12 @@ export interface SpeechDialogData {
     MatProgressSpinnerModule,
     FormsModule,
   ],
-  templateUrl: 'speech-dialog.html',
-  styleUrl: 'speech-dialog.scss',
+  templateUrl: 'plant-growth-speech-dialog.html',
+  styleUrl: 'plant-growth-speech-dialog.scss',
 })
-export class SpeechDialog implements OnDestroy {
-  private dialogRef = inject(MatDialogRef<SpeechDialog>);
-  private modalData: SpeechDialogData = inject(MAT_DIALOG_DATA);
+export class PlantGrowthSpeechDialog implements OnDestroy {
+  private dialogRef = inject(MatDialogRef<PlantGrowthSpeechDialog>);
+  private modalData: PlantGrowthSpeechDialogData = inject(MAT_DIALOG_DATA);
 
   isRecording = false;
   isLoading = false;
@@ -57,7 +57,6 @@ export class SpeechDialog implements OnDestroy {
   }
 
   private recognition: any;
-  private silenceTimer: any;
   private finalTranscript = '';
 
   constructor(private ollama: Ollama, private changeDetectorRef: ChangeDetectorRef) {

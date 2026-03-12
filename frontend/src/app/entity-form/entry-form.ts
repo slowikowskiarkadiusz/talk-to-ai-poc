@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { EntryFormData } from '../ollama';
-import { SpeechDialog, SpeechDialogData } from '../speech-dialog/speech-dialog';
+import { PlantGrowthSpeechDialog, PlantGrowthSpeechDialogData } from '../plant-growth-speech-dialog/plant-growth-speech-dialog';
 
 export const targetKindDictionary: { [p: string]: string[] } = {
   "Pests": [
@@ -115,8 +115,8 @@ export class EntryForm {
   }
 
   openSpeechDialog() {
-    const data: SpeechDialogData = { greenhouses: this.greenhouses, blocks: this.blocks, targetKinds: getTargetKinds() };
-    const ref = this.dialog.open(SpeechDialog, { width: '480px', data });
+    const data: PlantGrowthSpeechDialogData = { greenhouses: this.greenhouses, blocks: this.blocks, targetKinds: getTargetKinds() };
+    const ref = this.dialog.open(PlantGrowthSpeechDialog, { width: '480px', data });
     ref.afterClosed().subscribe((data: EntryFormData) => {
       console.log("data", data);
       if (!data)
