@@ -44,9 +44,9 @@ import { MatIconModule } from '@angular/material/icon';
     p {
       color: var(--mat-sys-on-surface-variant);
       font-size: 1rem;
-      max-width: 280px;
+      max-width: 100%;
       line-height: 1.5;
     }
   `]
 })
-export class HomeComponent {}
+export class HomeComponent { }

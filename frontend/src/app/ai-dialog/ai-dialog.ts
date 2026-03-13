@@ -64,10 +64,10 @@ export class AiDialog implements OnDestroy {
   private finalTranscript = '';
 
   constructor(private changeDetectorRef: ChangeDetectorRef, private ollama: Ollama) {
-    ollama.processAiActionRequest("my ceiling light is way too bright");
+    // ollama.processAiActionRequest("my ceiling light is way too bright");
 
-    // this.initRecognition();
-    // this.startRecording();
+    this.initRecognition();
+    this.startRecording();
   }
 
   private initRecognition(): void {

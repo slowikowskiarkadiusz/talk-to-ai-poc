@@ -1,12 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Router } from '@angular/router';
-import { AiAction, AiProcessableComponent, AiProcessor } from '../ai-processors/ai-processor';
-import { pushAiProcessor } from '../ai-processors/list';
 
 interface WeatherData {
   current: {
@@ -118,7 +115,7 @@ const WMO_CODES: Record<number, { label: string; icon: string }> = {
   styles: [`
     .weather-container {
       padding: 24px 16px 96px;
-      max-width: 480px;
+      max-width: 100%;
       margin: 0 auto;
     }
     .center-state {
