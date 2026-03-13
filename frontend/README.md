@@ -58,6 +58,11 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.-->
 
+```
+OLLAMA_ORIGINS="*" OLLAMA_HOST=0.0.0.0 ollama serve
+ng serve --host 0.0.0.0 --ssl
+```
+
 first prompt:
 {
   "actions": {

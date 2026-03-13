@@ -25,6 +25,8 @@ export class AiDialog implements OnDestroy {
   private dialogRef = inject(MatDialogRef<AiDialog>);
 
   isRecording = false;
+  isLoading = false;
+  wasError = false;
   transcript = '';
 
   actions = [
@@ -64,10 +66,11 @@ export class AiDialog implements OnDestroy {
   private finalTranscript = '';
 
   constructor(private changeDetectorRef: ChangeDetectorRef, private ollama: Ollama) {
-    // ollama.processAiActionRequest("my ceiling light is way too bright");
-
     this.initRecognition();
     this.startRecording();
+
+    // this.transcript = "turn the tv plug off";
+    // this.onFinish();
   }
 
   private initRecognition(): void {
@@ -122,7 +125,17 @@ export class AiDialog implements OnDestroy {
 
   onFinish(): void {
     this.stopRecording();
-    this.dialogRef.close(this.transcript);
+    this.sendToServer();
+  }
+
+  private sendToServer(): void {
+    if (!this.transcript) return;
+    this.isLoading = true;
+    this.changeDetectorRef.markForCheck();
+
+    this.ollama.processAiActionRequest(this.transcript)
+      .then(x => { this.dialogRef.close(x) })
+      .catch(() => { this.wasError = true; this.sendToServer(); });
   }
 
   onClose(): void {

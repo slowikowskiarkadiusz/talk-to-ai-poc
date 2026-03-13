@@ -41,8 +41,8 @@ export class Ollama {
     console.log("firstResult", firstResult);
     const aiProcessor = aiProcessors.filter(x => x.appName == firstResult[0])[0];
     const aiAction = aiProcessor.actions.filter(x => x.name == firstResult[1])[0];
-    const secondResult = await this.sendActionPrompt(transcript, aiAction);
-    runInInjectionContext(this.injector, () => aiAction.func(secondResult));
+    const secondResult = aiAction.parameters.length > 0 ? await this.sendActionPrompt(transcript, aiAction) : {};
+    runInInjectionContext(this.injector, () => aiAction.func(secondResult, this.injector));
   }
 
   private async sendOverviewPrompt(transcript: string): Promise<[string, string]> {
@@ -57,8 +57,12 @@ export class Ollama {
 
     Return ONLY: "AppName, ActionName". No explanation, no other text or quotes or anything. Just letters and a comma.`;
     console.log("prompt", prompt);
-    const result = await this.sendPrompt(prompt);
+    let result = await this.sendPrompt(prompt);
     console.log("result", result);
+    if (result[0] == '"')
+      result = result.substring(1);
+    if (result[result.length - 1] == '"')
+      result = result.substring(0, result.length - 1);
     const split = result.split(',');
     return [split[0].trim().toLowerCase(), split[1].trim().toLowerCase()];
   }

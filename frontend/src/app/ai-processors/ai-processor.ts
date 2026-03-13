@@ -1,4 +1,4 @@
-import { ProviderToken } from "@angular/core";
+import { Injector, ProviderToken } from "@angular/core";
 
 export class AiActionParameter {
   public name: string;
@@ -15,9 +15,9 @@ export class AiActionParameter {
 export class AiAction {
   public name: string;
   public parameters: AiActionParameter[];
-  public func: (parameters: { [p: string]: string }) => void;
+  public func: (parameters: { [p: string]: string }, injector: Injector) => void;
 
-  constructor(name: string, parameters: AiActionParameter[], func: (parameters: { [p: string]: string }) => void) {
+  constructor(name: string, parameters: AiActionParameter[], func: (parameters: { [p: string]: string }, injector: Injector) => void) {
     this.name = name;
     this.parameters = parameters;
     this.func = func;

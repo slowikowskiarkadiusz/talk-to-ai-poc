@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { PlantEntriesDb } from '../plant-entries-db';
 import { EntryFormData } from '../ollama';
 import { PlantGrowthSpeechDialog, PlantGrowthSpeechDialogData } from '../plant-growth-speech-dialog/plant-growth-speech-dialog';
 
@@ -81,7 +81,7 @@ function getTargetKinds(): string[] {
 })
 export class EntryForm {
   private dialogRef = inject(MatDialogRef<EntryForm>);
-  private http = inject(HttpClient);
+  private db = inject(PlantEntriesDb);
 
   greenhouses = ['Greenhouse 1', 'Greenhouse 2', 'Greenhouse 3'];
   blocks = ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6'];
@@ -136,9 +136,7 @@ export class EntryForm {
   onSubmit() {
     if (!this.form.valid) return;
     const { target, ...payload } = this.form.value;
-    this.http.post('/api/plantentries', payload).subscribe({
-      next: () => this.dialogRef.close(true),
-    });
+    this.db.add(payload).then(() => this.dialogRef.close(true));
   }
 
   onReset() {

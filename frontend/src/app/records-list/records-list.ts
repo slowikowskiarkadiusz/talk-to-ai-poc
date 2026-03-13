@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTableModule } from '@angular/material/table';
+import { PlantEntriesDb } from '../plant-entries-db';
 
 export interface PlantEntry {
   id: number;
@@ -25,7 +25,7 @@ export interface PlantEntry {
   styleUrl: 'records-list.scss',
 })
 export class RecordsList implements OnInit {
-  private http = inject(HttpClient);
+  private db = inject(PlantEntriesDb);
 
   records: PlantEntry[] = [];
   loading = true;
@@ -37,14 +37,15 @@ export class RecordsList implements OnInit {
 
   loadRecords() {
     this.loading = true;
-    this.http.get<PlantEntry[]>('/api/plantentries').subscribe({
-      next: (data) => {
+    return new Promise((resolve, reject) => {
+      this.db.getAll().then((data) => {
         this.records = data;
         this.loading = false;
-      },
-      error: () => {
+        resolve(null);
+      }).catch(() => {
         this.loading = false;
-      },
+        reject();
+      });
     });
   }
 }

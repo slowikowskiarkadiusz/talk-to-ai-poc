@@ -1,0 +1,96 @@
+<div class="devices-container">
+  <div class="summary-row">
+    <div class="summary-card">
+      <mat-icon>power</mat-icon>
+      <span class="s-value">{{ activeCount }}</span>
+      <span class="s-label">Active</span>
+    </div>
+    <div class="summary-card">
+      <mat-icon>devices</mat-icon>
+      <span class="s-value">{{ devices.length }}</span>
+      <span class="s-label">Devices</span>
+    </div>
+    <div class="summary-card">
+      <mat-icon>meeting_room</mat-icon>
+      <span class="s-value">{{ rooms.length }}</span>
+      <span class="s-label">Rooms</span>
+    </div>
+  </div>
+
+  <div class="filter-chips">
+    <mat-chip-listbox [(ngModel)]="selectedRoom" aria-label="Room filter">
+      <mat-chip-option value="">All</mat-chip-option>
+      @for (room of rooms; track room) {
+      <mat-chip-option [value]="room">{{ room }}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </div>
+
+  <div class="devices-grid">
+    @for (device of filteredDevices; track device.id) {
+    <div class="device-card" [class.active]="isActive(device)" [id]="device.name">
+      <div class="device-header">
+        <div
+          class="device-icon-wrap"
+          [style.background]="isActive(device) ? device.color : '#9e9e9e'"
+        >
+          <mat-icon>{{ device.icon }}</mat-icon>
+        </div>
+        <div class="device-info">
+          <span class="device-name">{{ device.name }}</span>
+          <span class="device-room">{{ device.room }}</span>
+        </div>
+        @if (device.type === 'light' || device.type === 'plug') {
+        <mat-slide-toggle
+          [checked]="device.status === 'on'"
+          (change)="toggleDevice(device)"
+          color="primary"
+        >
+        </mat-slide-toggle>
+        } @else if (device.type === 'lock') {
+        <button class="lock-btn" (click)="toggleLock(device)">
+          <mat-icon>{{ device.status === 'locked' ? 'lock' : 'lock_open' }}</mat-icon>
+        </button>
+        }
+      </div>
+
+      @if (device.type === 'thermostat' && device.value !== undefined) {
+      <div class="thermostat-control">
+        <span class="thermo-val">{{ device.value }}{{ device.unit }}</span>
+        <div class="thermo-buttons">
+          <button class="thermo-btn" (click)="adjustTemp(device, -0.5)">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <button class="thermo-btn" (click)="adjustTemp(device, 0.5)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+      } @if (device.type === 'light' && device.status === 'on' && device.value !== undefined) {
+      <div class="brightness-row">
+        <mat-icon class="dim-icon">brightness_low</mat-icon>
+        <mat-slider
+          min="10"
+          max="100"
+          step="10"
+          discrete
+          [displayWith]="formatBrightness"
+          style="flex: 1"
+        >
+          <input matSliderThumb [(ngModel)]="device.value" />
+        </mat-slider>
+        <mat-icon class="dim-icon">brightness_high</mat-icon>
+      </div>
+      }
+
+      <div
+        class="status-badge"
+        [class.status-on]="isActive(device)"
+        [class.status-off]="!isActive(device)"
+      >
+        {{ statusLabel(device) }}
+      </div>
+    </div>
+    }
+  </div>
+</div>

@@ -1,12 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
-import { Router } from '@angular/router';
-import { AiAction, AiActionParameter, AiProcessableComponent, AiProcessor } from '../ai-processors/ai-processor';
-import { pushAiProcessor } from '../ai-processors/list';
+import { filter } from 'rxjs';
+import { AiReactionService } from '../ai-reaction.service';
 
 type DeviceType = 'light' | 'thermostat' | 'plug' | 'camera' | 'lock' | 'sensor';
 type DeviceStatus = 'on' | 'off' | 'locked' | 'unlocked' | 'motion' | 'idle';
@@ -27,237 +26,11 @@ interface Device {
   selector: 'app-devices',
   standalone: true,
   imports: [MatIconModule, MatSlideToggleModule, MatSliderModule, MatChipsModule, FormsModule],
-  template: `
-    <div class="devices-container">
-      <div class="summary-row">
-        <div class="summary-card">
-          <mat-icon>power</mat-icon>
-          <span class="s-value">{{ activeCount }}</span>
-          <span class="s-label">Active</span>
-        </div>
-        <div class="summary-card">
-          <mat-icon>devices</mat-icon>
-          <span class="s-value">{{ devices.length }}</span>
-          <span class="s-label">Devices</span>
-        </div>
-        <div class="summary-card">
-          <mat-icon>meeting_room</mat-icon>
-          <span class="s-value">{{ rooms.length }}</span>
-          <span class="s-label">Rooms</span>
-        </div>
-      </div>
-
-      <div class="filter-chips">
-        <mat-chip-listbox [(ngModel)]="selectedRoom" aria-label="Room filter">
-          <mat-chip-option value="">All</mat-chip-option>
-          @for (room of rooms; track room) {
-            <mat-chip-option [value]="room">{{ room }}</mat-chip-option>
-          }
-        </mat-chip-listbox>
-      </div>
-
-      <div class="devices-grid">
-        @for (device of filteredDevices; track device.id) {
-          <div class="device-card" [class.active]="isActive(device)">
-            <div class="device-header">
-              <div class="device-icon-wrap" [style.background]="isActive(device) ? device.color : '#9e9e9e'">
-                <mat-icon>{{ device.icon }}</mat-icon>
-              </div>
-              <div class="device-info">
-                <span class="device-name">{{ device.name }}</span>
-                <span class="device-room">{{ device.room }}</span>
-              </div>
-              @if (device.type === 'light' || device.type === 'plug') {
-                <mat-slide-toggle
-                  [checked]="device.status === 'on'"
-                  (change)="toggleDevice(device)"
-                  color="primary">
-                </mat-slide-toggle>
-              } @else if (device.type === 'lock') {
-                <button class="lock-btn" (click)="toggleLock(device)">
-                  <mat-icon>{{ device.status === 'locked' ? 'lock' : 'lock_open' }}</mat-icon>
-                </button>
-              }
-            </div>
-
-            @if (device.type === 'thermostat' && device.value !== undefined) {
-              <div class="thermostat-control">
-                <span class="thermo-val">{{ device.value }}{{ device.unit }}</span>
-                <div class="thermo-buttons">
-                  <button class="thermo-btn" (click)="adjustTemp(device, -0.5)">
-                    <mat-icon>remove</mat-icon>
-                  </button>
-                  <button class="thermo-btn" (click)="adjustTemp(device, 0.5)">
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </div>
-              </div>
-            }
-
-            @if (device.type === 'light' && device.status === 'on' && device.value !== undefined) {
-              <div class="brightness-row">
-                <mat-icon class="dim-icon">brightness_low</mat-icon>
-                <mat-slider min="10" max="100" step="10" discrete [displayWith]="formatBrightness" style="flex:1">
-                  <input matSliderThumb [(ngModel)]="device.value">
-                </mat-slider>
-                <mat-icon class="dim-icon">brightness_high</mat-icon>
-              </div>
-            }
-
-            <div class="status-badge" [class.status-on]="isActive(device)" [class.status-off]="!isActive(device)">
-              {{ statusLabel(device) }}
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  `,
-  styles: [`
-    .devices-container {
-      padding: 16px 16px 96px;
-    }
-    .summary-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .summary-card {
-      background: var(--mat-sys-surface-container-low);
-      border-radius: 14px;
-      padding: 14px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      mat-icon { color: var(--mat-sys-primary); font-size: 22px; width: 22px; height: 22px; }
-    }
-    .s-value { font-size: 1.4rem; font-weight: 600; color: var(--mat-sys-on-surface); line-height: 1; }
-    .s-label { font-size: 0.72rem; color: var(--mat-sys-on-surface-variant); }
-    .filter-chips {
-      margin-bottom: 16px;
-    }
-    .devices-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-    }
-    .device-card {
-      background: var(--mat-sys-surface-container-low);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border: 1.5px solid transparent;
-      transition: border-color 0.2s;
-      &.active {
-        border-color: var(--mat-sys-primary);
-      }
-    }
-    .device-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .device-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.3s;
-      mat-icon { color: white; font-size: 22px; width: 22px; height: 22px; }
-    }
-    .device-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .device-name {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--mat-sys-on-surface);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .device-room {
-      font-size: 0.75rem;
-      color: var(--mat-sys-on-surface-variant);
-    }
-    .lock-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      mat-icon { color: var(--mat-sys-on-surface-variant); font-size: 24px; width: 24px; height: 24px; }
-      &:hover mat-icon { color: var(--mat-sys-primary); }
-    }
-    .thermostat-control {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 4px;
-    }
-    .thermo-val {
-      font-size: 1.6rem;
-      font-weight: 300;
-      color: var(--mat-sys-on-surface);
-    }
-    .thermo-buttons {
-      display: flex;
-      gap: 4px;
-    }
-    .thermo-btn {
-      background: var(--mat-sys-surface-container);
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      &:hover { background: var(--mat-sys-surface-container-high); }
-      mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--mat-sys-on-surface); }
-    }
-    .brightness-row {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .dim-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: var(--mat-sys-on-surface-variant);
-    }
-    .status-badge {
-      font-size: 0.72rem;
-      font-weight: 500;
-      padding: 3px 10px;
-      border-radius: 99px;
-      align-self: flex-start;
-      &.status-on {
-        background: color-mix(in srgb, var(--mat-sys-primary) 15%, transparent);
-        color: var(--mat-sys-primary);
-      }
-      &.status-off {
-        background: var(--mat-sys-surface-container);
-        color: var(--mat-sys-on-surface-variant);
-      }
-    }
-  `]
+  templateUrl: './devices.html',
+  styleUrl: './devices.scss'
 })
 export class DevicesComponent {
+  changeDetector = inject(ChangeDetectorRef);
   selectedRoom = '';
 
   devices: Device[] = [
@@ -274,6 +47,65 @@ export class DevicesComponent {
     { id: 11, name: 'Front camera', room: 'Outside', type: 'camera', status: 'motion', icon: 'videocam', color: '#0ea5e9' },
     { id: 12, name: 'Smoke detector', room: 'Kitchen', type: 'sensor', status: 'idle', icon: 'detector_smoke', color: '#8b5cf6' },
   ];
+
+  constructor(aiReactionService: AiReactionService) {
+    aiReactionService
+      .subject
+      .pipe(filter(x => x.appName == "devices"))
+      .subscribe(x => {
+        if (x.action == "dim lamp") {
+          const device = this.devices.filter(d => d.name.replace(' lamp', '') == x.actionValues[0].replace(' lamp', ''))[0];
+          if (device) {
+            document.getElementById(x.actionValues[0])?.scrollIntoView({ behavior: 'smooth' });
+            this.changeDetector.markForCheck();
+            const changeValue = (dir: number) => setTimeout(() => {
+              device.value! += 1 * dir;
+              this.changeDetector.markForCheck();
+              if (device.value != +x.actionValues[1]) {
+                if (Math.abs(device.value! - +x.actionValues[1]) < 1)
+                  device.value = +x.actionValues[1];
+                else
+                  changeValue(dir);
+              }
+            });
+            setTimeout(() => {
+              changeValue(device.value! > +x.actionValues[1] ? -1 : 1);
+            }, 1000);
+          }
+        } else if (x.action == "tweak thermostat") {
+          const device = this.devices.filter(d => d.name == "Thermostat")[0];
+          if (device) {
+            document.getElementById("Thermostat")?.scrollIntoView({ behavior: 'smooth' });
+            this.changeDetector.markForCheck();
+            const changeValue = (dir: number) => setTimeout(() => {
+              device.value! += 0.05 * dir;
+              device.value = Math.round(device.value! * 100) / 100
+              this.changeDetector.markForCheck();
+              if (device.value != +x.actionValues[0]) {
+                if (Math.abs(device.value! - +x.actionValues[0]) < 1)
+                  device.value = +x.actionValues[0];
+                else
+                  changeValue(dir);
+              }
+            });
+            setTimeout(() => {
+              changeValue(device.value! > +x.actionValues[0] ? -1 : 1);
+            }, 1000);
+          }
+        }
+        else if (x.action == "turn device on or off") {
+          const device = this.devices.filter(d => d.name.includes(x.actionValues[0]))[0];
+          if (device) {
+            document.getElementById(device.name)?.scrollIntoView({ behavior: 'smooth' });
+            this.changeDetector.markForCheck();
+            setTimeout(() => {
+              device.status = x.actionValues[1];
+              this.changeDetector.markForCheck();
+            }, 1000);
+          }
+        }
+      });
+  }
 
   get rooms() {
     return [...new Set(this.devices.map(d => d.room))];
