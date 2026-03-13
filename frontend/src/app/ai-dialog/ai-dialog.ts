@@ -23,36 +23,27 @@ import { Ollama } from '../ollama';
 })
 export class AiDialog implements OnDestroy {
   private dialogRef = inject(MatDialogRef<AiDialog>);
-
   isRecording = false;
   isLoading = false;
   wasError = false;
   transcript = '';
-
   actions = [
     {
       icon: 'open_in_new',
       label: 'Navigate to app',
-      examples: [
-        'open plant growth',
-        'go to settings',
-        'show me the apps',
-      ],
+      examples: ['open plant growth', 'go to settings', 'show me the apps'],
     },
     {
       icon: 'bar_chart',
       label: 'Summarize data',
-      examples: [
-        'show plant growth summary',
-        'what was recorded this week?',
-      ],
+      examples: ['show plant growth summary', 'what was recorded this week?'],
     },
     {
       icon: 'add_circle',
       label: 'Create new entry',
       examples: [
         'open form for creating a new plant growth entry',
-        'i just inspected a plant at the first greenhouse and the second block. it\'s 2 centimeters high and i spotted some gray wall',
+        "i just inspected a plant at the first greenhouse and the second block. it's 2 centimeters high and i spotted some gray wall",
       ],
     },
   ];
@@ -64,13 +55,11 @@ export class AiDialog implements OnDestroy {
 
   private recognition: any;
   private finalTranscript = '';
+  private silenceTimer: any;
 
   constructor(private changeDetectorRef: ChangeDetectorRef, private ollama: Ollama) {
     this.initRecognition();
     this.startRecording();
-
-    // this.transcript = "turn the tv plug off";
-    // this.onFinish();
   }
 
   private initRecognition(): void {
@@ -79,12 +68,10 @@ export class AiDialog implements OnDestroy {
       console.warn('SpeechRecognition not supported.');
       return;
     }
-
     this.recognition = new SR();
     this.recognition.lang = 'en-US';
     this.recognition.continuous = true;
     this.recognition.interimResults = true;
-
     this.recognition.onresult = (event: any) => {
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -97,13 +84,16 @@ export class AiDialog implements OnDestroy {
       }
       this.transcript = (this.finalTranscript + interim).trim();
       this.changeDetectorRef.markForCheck();
-    };
 
+      clearTimeout(this.silenceTimer);
+      this.silenceTimer = setTimeout(() => {
+        this.onFinish();
+      }, 1000);
+    };
     this.recognition.onerror = (event: any) => {
       console.error('SpeechRecognition error:', event.error);
       this.isRecording = false;
     };
-
     this.recognition.onend = () => {
       this.isRecording = false;
     };
@@ -119,6 +109,7 @@ export class AiDialog implements OnDestroy {
 
   private stopRecording(): void {
     if (!this.recognition) return;
+    clearTimeout(this.silenceTimer);
     this.isRecording = false;
     this.recognition.stop();
   }
@@ -132,9 +123,8 @@ export class AiDialog implements OnDestroy {
     if (!this.transcript) return;
     this.isLoading = true;
     this.changeDetectorRef.markForCheck();
-
     this.ollama.processAiActionRequest(this.transcript)
-      .then(x => { this.dialogRef.close(x) })
+      .then(x => { this.dialogRef.close(x); })
       .catch(() => { this.wasError = true; this.sendToServer(); });
   }
 

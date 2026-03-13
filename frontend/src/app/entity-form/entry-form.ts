@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { PlantEntriesDb } from '../plant-entries-db';
 import { EntryFormData } from '../ollama';
+import { PlantEntriesDb } from '../plant-entries-db';
 import { PlantGrowthSpeechDialog, PlantGrowthSpeechDialogData } from '../plant-growth-speech-dialog/plant-growth-speech-dialog';
 
 export const targetKindDictionary: { [p: string]: string[] } = {
@@ -59,9 +59,12 @@ export const targetKindDictionary: { [p: string]: string[] } = {
   ],
 };
 
-function getTargetKinds(): string[] {
+export function getTargetKinds(): string[] {
   return Object.values(targetKindDictionary).flatMap(x => x);
 }
+
+export const greenhouses = ['Greenhouse 1', 'Greenhouse 2', 'Greenhouse 3'];
+export const blocks = ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6'];
 
 @Component({
   selector: 'entry-form',
@@ -79,12 +82,14 @@ function getTargetKinds(): string[] {
   templateUrl: 'entry-form.html',
   styleUrl: 'entry-form.scss',
 })
-export class EntryForm {
+export class EntryForm implements AfterViewInit {
   private dialogRef = inject(MatDialogRef<EntryForm>);
   private db = inject(PlantEntriesDb);
 
-  greenhouses = ['Greenhouse 1', 'Greenhouse 2', 'Greenhouse 3'];
-  blocks = ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6'];
+  injectedData: EntryFormData | undefined = inject(MAT_DIALOG_DATA);
+
+  greenhouses = greenhouses;
+  blocks = blocks;
   targets = Object.keys(targetKindDictionary);
   targetKinds: string[] = [];
 
@@ -112,6 +117,20 @@ export class EntryForm {
     });
 
     this.form.controls['target'].valueChanges.subscribe(x => this.targetKinds = targetKindDictionary[x]);
+  }
+
+  ngAfterViewInit(): void {
+    if (this.injectedData) {
+      if (this.injectedData.targetKind)
+        this.form.controls['target'].setValue(Object.keys(targetKindDictionary).filter(x => targetKindDictionary[x].includes(this.injectedData!.targetKind))[0]);
+
+      for (let controlName of Object.keys(this.form.controls)) {
+        //@ts-ignore
+        const newControlData = this.injectedData[controlName];
+        if (newControlData != null && newControlData != "")
+          this.form.controls[controlName].setValue(newControlData);
+      }
+    }
   }
 
   openSpeechDialog() {
